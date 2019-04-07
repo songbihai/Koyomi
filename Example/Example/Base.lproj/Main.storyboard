@@ -30,10 +30,9 @@
                                 <segments>
                                     <segment title="First"/>
                                     <segment title="Second"/>
-                                    <segment title=""/>
                                 </segments>
                                 <connections>
-                                    <action selector="tappedControl:" destination="vXZ-lx-hvc" eventType="valueChanged" id="qvK-XO-ueW"/>
+                                    <action selector="monthChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="d6e-nB-RE3"/>
                                 </connections>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YrJ-h9-b09">
@@ -42,24 +41,57 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Qvo-nD-LYh">
+                                <rect key="frame" x="142" y="585" width="130" height="28"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="130" id="G63-4w-DVK"/>
+                                    <constraint firstAttribute="height" constant="27" id="SiP-3V-NON"/>
+                                </constraints>
+                                <segments>
+                                    <segment title="Chinaese"/>
+                                    <segment title="Gregorian"/>
+                                </segments>
+                                <connections>
+                                    <action selector="segmentChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="hHM-b7-rR7"/>
+                                </connections>
+                            </segmentedControl>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" momentary="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fEb-mg-KcV">
+                                <rect key="frame" x="116" y="506" width="182" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="29" id="OzB-ge-yUW"/>
+                                    <constraint firstAttribute="width" constant="182" id="ty1-yA-JwE"/>
+                                </constraints>
+                                <segments>
+                                    <segment title="First"/>
+                                    <segment title="Second"/>
+                                </segments>
+                                <connections>
+                                    <action selector="yearChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="Bgi-en-B9i"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="Qvo-nD-LYh" firstAttribute="top" secondItem="fEb-mg-KcV" secondAttribute="bottom" constant="50" id="1bT-rZ-XdV"/>
                             <constraint firstItem="N6y-Sa-BPO" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="15" id="5Y6-9r-3mv"/>
                             <constraint firstItem="N6y-Sa-BPO" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="15" id="7jK-0a-F4f"/>
                             <constraint firstItem="N6y-Sa-BPO" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="Eu6-2f-eQV"/>
+                            <constraint firstItem="fEb-mg-KcV" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="HI6-uK-Uha"/>
                             <constraint firstItem="YrJ-h9-b09" firstAttribute="top" secondItem="N6y-Sa-BPO" secondAttribute="bottom" constant="20" id="cD3-TB-aqM"/>
+                            <constraint firstItem="Qvo-nD-LYh" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="ise-Qr-hAU"/>
                             <constraint firstItem="YrJ-h9-b09" firstAttribute="centerX" secondItem="N6y-Sa-BPO" secondAttribute="centerX" id="khD-ys-SAG"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="Qvo-nD-LYh" secondAttribute="bottom" constant="250" id="rOM-Jh-M2Y"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="currentDateLabel" destination="YrJ-h9-b09" id="ZiE-SC-toF"/>
                         <outlet property="segmentedControl" destination="N6y-Sa-BPO" id="ReB-6L-NJL"/>
+                        <outlet property="yearSegmentControl" destination="fEb-mg-KcV" id="ufx-mU-bDf"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="136.80000000000001" y="105.69715142428787"/>
+            <point key="canvasLocation" x="136.23188405797103" y="105.13392857142857"/>
         </scene>
     </scenes>
 </document>

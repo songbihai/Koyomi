@@ -254,7 +254,7 @@ final public class Koyomi: UICollectionView {
             reloadData()
         }
     }
-    @IBInspectable public var currentDateFormat: String = "M/yyyy"
+    @IBInspectable public var currentDateFormat: String = "MM/yyyy"
     
     // Color properties of the appearance
     @IBInspectable public var sectionSeparatorColor: UIColor = UIColor.KoyomiColor.lightGray {
@@ -293,7 +293,13 @@ final public class Koyomi: UICollectionView {
         return KoyomiLayout(inset: inset, cellSpace: cellSpace, sectionSpace: sectionSpace, weekCellHeight: weekCellHeight)
     }
     
-    fileprivate var calendarType: CalendarType = .gregorian
+    var calendarType: CalendarType = .gregorian {
+        didSet {
+            guard calendarType != oldValue else { return }
+            model.calendarType = calendarType
+            reloadData()
+        }
+    }
     
     fileprivate var dayLabelFont: UIFont?
     fileprivate var weekLabelFont: UIFont?
@@ -325,7 +331,13 @@ final public class Koyomi: UICollectionView {
     public func display(in month: MonthType) {
         model.display(in: month)
         reloadData()
-        calendarDelegate?.koyomi?(self, currentDateString: model.dateString(in: .current, withFormat: currentDateFormat))
+        calendarDelegate?.koyomi?(self, currentDateString: model.dateString(in: .current, year: .current, withFormat: currentDateFormat))
+    }
+    
+    public func display(of year: YearType) {
+        model.display(of: year)
+        reloadData()
+        calendarDelegate?.koyomi?(self, currentDateString: model.dateString(in: .current, year: .current, withFormat: currentDateFormat))
     }
     
     @discardableResult
@@ -340,8 +352,8 @@ final public class Koyomi: UICollectionView {
         return self
     }
     
-    public func currentDateString(withFormat format: String = "M/yyyy") -> String {
-        return model.dateString(in: .current, withFormat: format)
+    public func currentDateString(withFormat format: String = "MM/yyyy") -> String {
+        return model.dateString(in: .current, year: .current, withFormat: format)
     }
     
     @discardableResult
@@ -447,9 +459,9 @@ private extension Koyomi {
             
             textColor = {
                 var baseColor: UIColor {
-                    if let beginning = model.indexAtBeginning(in: .current), indexPath.row < beginning {
+                    if let beginning = model.indexAtBeginning(in: .current, year: .current), indexPath.row < beginning {
                         return otherMonthColor
-                    } else if let end = model.indexAtEnd(in: .current), indexPath.row > end {
+                    } else if let end = model.indexAtEnd(in: .current, year: .current), indexPath.row > end {
                         return otherMonthColor
                     } else if let type = DateModel.WeekType(indexPath), type == .sunday {
                         return holidayColor.sunday

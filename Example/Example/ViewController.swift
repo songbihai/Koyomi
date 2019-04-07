@@ -10,6 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    var koyomi: Koyomi!
 
     @IBOutlet fileprivate weak var currentDateLabel: UILabel!
     
@@ -18,29 +19,64 @@ class ViewController: UIViewController {
     @IBOutlet fileprivate weak var segmentedControl: UISegmentedControl! {
         didSet {
             segmentedControl.setTitle("Previous", forSegmentAt: 0)
-            segmentedControl.setTitle("Current", forSegmentAt: 1)
-            segmentedControl.setTitle("Next", forSegmentAt: 2)
+            segmentedControl.setTitle("Next", forSegmentAt: 1)
+        }
+    }
+    
+    @IBOutlet weak var yearSegmentControl: UISegmentedControl! {
+        didSet {
+            yearSegmentControl.setTitle("Previous", forSegmentAt: 0)
+            yearSegmentControl.setTitle("Next", forSegmentAt: 1)
         }
     }
     
     
+    @IBAction func monthChanged(_ sender: UISegmentedControl) {
+        
+        if sender.selectedSegmentIndex == 0 {
+            koyomi.display(in: .previous)
+        }else if sender.selectedSegmentIndex == 1 {
+            koyomi.display(in: .next)
+        }
+        
+    }
+    
+    
+    @IBAction func yearChanged(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            koyomi.display(of: .previous)
+        }else if sender.selectedSegmentIndex == 1 {
+            koyomi.display(of: .next)
+        }
+    }
+    
+    @IBAction func segmentChanged(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            koyomi.calendarType = .chinaese
+        }else {
+            koyomi.calendarType = .gregorian
+        }
+        currentDateLabel.text = koyomi.currentDateString()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let frame = CGRect(x: 10, y : 140, width: UIScreen.main.bounds.width-20, height: 300)
-        let koyomi = Koyomi(frame: frame, calendarType: .gregorian, sectionSpace: 1, cellSpace: 1, inset: .zero, weekCellHeight: 40)
+        koyomi = Koyomi(frame: frame, calendarType: .chinaese, sectionSpace: 1, cellSpace: 1, inset: .zero, weekCellHeight: 40)
         view.addSubview(koyomi)
-        koyomi.circularViewDiameter = 0.2
+        koyomi.circularViewDiameter = 0.6
         koyomi.calendarDelegate = self
         koyomi.inset = UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1)
         koyomi.weeks = ("周日", "周一", "周二", "周三", "周四", "周五", "周六")
         koyomi.style = .standard
         koyomi.dayPosition = .center
-        koyomi.selectionMode = .sequence(style: .semicircleEdge)
-        koyomi.selectedStyleColor = UIColor(red: 203/255, green: 119/255, blue: 223/255, alpha: 1)
+        koyomi.selectionMode = .single(style: .circle)
         koyomi
-            .setDayFont(size: 14)
-            .setWeekFont(size: 10)
+            .setDayFont(size: 12)
+            .setWeekFont(size: 12)
         currentDateLabel.text = koyomi.currentDateString()
+        
+        
     }
     
     // MARK: - Utility -

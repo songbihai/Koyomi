@@ -10,13 +10,20 @@ import UIKit
 
 public enum MonthType { case previous, current, next }
 
+public enum YearType { case previous, current, next }
+
 final class DateModel: NSObject {
     
     // Type properties
     static let dayCountPerRow = 7
     static let maxCellCount   = 42
     
-    var chinaeseDay: [String] = ["初一", "初二", "初三", "初四", "初五", "初六", "初七", "初八", "初九", "初十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十", "廿一", "廿二", "廿三", "廿四", "廿五", "廿六", "廿七", "廿八", "廿九", "三十", ]
+    var chinaeseYear: [String] = ["甲子", "乙丑", "丙寅", "丁卯", "戊辰", "己巳", "庚午", "辛未", "壬申", "癸酉", "甲戌", "乙亥", "丙子", "丁丑", "戊寅", "己卯", "庚辰", "辛己",  "壬午", "癸未", "甲申", "乙酉", "丙戌", "丁亥", "戊子", "己丑", "庚寅", "辛卯", "壬辰", "癸巳", "甲午", "乙未", "丙申", "丁酉", "戊戌", "己亥", "庚子", "辛丑", "壬寅", "癸丑", "甲辰", "乙巳", "丙午", "丁未", "戊申", "己酉", "庚戌", "辛亥", "壬子", "癸丑", "甲寅", "乙卯", "丙辰", "丁巳", "戊午", "己未", "庚申", "辛酉", "壬戌", "癸亥"]
+    
+    var chinaeseMonth: [String] = ["正月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "冬月", "腊月"];
+    
+    var chinaeseDay: [String] = ["初一", "初二", "初三", "初四", "初五", "初六", "初七", "初八", "初九", "初十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九", "二十", "廿一", "廿二", "廿三", "廿四", "廿五", "廿六", "廿七", "廿八", "廿九", "三十"]
+    
     // Week text
     var weeks: (String, String, String, String, String, String, String) = ("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
     
@@ -38,7 +45,13 @@ final class DateModel: NSObject {
         }
     }
     
-    var calendarType: CalendarType
+    var calendarType: CalendarType {
+        didSet {
+            if calendarType != oldValue {
+                setup()
+            }
+        }
+    }
     
     enum SelectionMode { case single, multiple, sequence, none }
     
@@ -63,23 +76,23 @@ final class DateModel: NSObject {
     
     // MARK: - Internal Methods -
     
-    func cellCount(in month: MonthType) -> Int {
-        if let weeksRange = calendar.range(of: .weekOfMonth, in: .month, for: atBeginning(of: month)) {
+    func cellCount(in month: MonthType, year: YearType) -> Int {
+        if let weeksRange = calendar.range(of: .weekOfMonth, in: .month, for: atBeginning(of: month, year: year)) {
             let count = weeksRange.upperBound - weeksRange.lowerBound
             return count * DateModel.dayCountPerRow
         }
         return 0
     }
     
-    func indexAtBeginning(in month: MonthType) -> Int? {
-        if let index = calendar.ordinality(of: .day, in: .weekOfMonth, for: atBeginning(of: month)) {
+    func indexAtBeginning(in month: MonthType, year: YearType) -> Int? {
+        if let index = calendar.ordinality(of: .day, in: .weekOfMonth, for: atBeginning(of: month, year: year)) {
             return index - 1
         }
         return nil
     }
     
-    func indexAtEnd(in month: MonthType) -> Int? {
-        if let rangeDays = calendar.range(of: .day, in: .month, for: atBeginning(of: month)), let beginning = indexAtBeginning(in: month) {
+    func indexAtEnd(in month: MonthType, year: YearType) -> Int? {
+        if let rangeDays = calendar.range(of: .day, in: .month, for: atBeginning(of: month, year: year)), let beginning = indexAtBeginning(in: month, year: year) {
             let count = rangeDays.upperBound - rangeDays.lowerBound
             return count + beginning - 1
         }
@@ -102,7 +115,7 @@ final class DateModel: NSObject {
     }
     
     func isOtherMonth(at indexPath: IndexPath) -> Bool {
-        if let beginning = indexAtBeginning(in: .current), let end = indexAtEnd(in: .current),
+        if let beginning = indexAtBeginning(in: .current, year: .current), let end = indexAtEnd(in: .current, year: .current),
             indexPath.row < beginning || indexPath.row > end {
             return true
         }
@@ -111,15 +124,42 @@ final class DateModel: NSObject {
     
     func display(in month: MonthType) {
         currentDates = []
-        currentDate = month == .current ? Date() : date(of: month)
+        currentDate = date(of: month, year: .current)
         setup()
     }
     
-    func dateString(in month: MonthType, withFormat format: String) -> String {
-        let formatter: DateFormatter = .init()
-        formatter.dateFormat = format
-        formatter.calendar = calendar
-        return formatter.string(from: date(of: month))
+    func display(of year: YearType) {
+        currentDates = []
+        currentDate = date(of: .current, year: year)
+        setup()
+    }
+    
+    func dateString(in month: MonthType, year: YearType, withFormat format: String) -> String {
+        if calendarType == .gregorian {
+            let formatter: DateFormatter = .init()
+            formatter.dateFormat = format
+            formatter.calendar = calendar
+            return formatter.string(from: date(of: month, year: year))
+        }else {
+            let formatter: DateFormatter = .init()
+            formatter.calendar = calendar
+            formatter.dateStyle = .short
+            var dateString = formatter.string(from: date(of: month, year: year))
+            let dateStrings = dateString.components(separatedBy: "/")
+            if let last = dateStrings.last {
+                dateString = last
+            }
+            formatter.dateStyle = .none
+            formatter.dateFormat = "yyyy"
+            if let year = Int(formatter.string(from: date(of: month, year: year))) {
+                dateString = chinaeseYear[year - 1] + "(\(dateString)) "
+            }
+            formatter.dateFormat = "MM"
+            if let month = Int(formatter.string(from: date(of: month, year: year))) {
+                dateString += chinaeseMonth[month - 1]
+            }
+            return dateString
+        }
     }
     
     func date(at indexPath: IndexPath) -> Date {
@@ -322,21 +362,21 @@ private extension DateModel {
     
     var calendar: Calendar {
         if calendarType == .gregorian {
-            return Calendar.init(identifier: .gregorian)
+            return Calendar(identifier: .gregorian)
         }else {
-            return Calendar.init(identifier: .chinese)
+            return Calendar(identifier: .chinese)
         }
     }
     
     func setup() {
         selectedDates = [:]
         
-        guard let indexAtBeginning = indexAtBeginning(in: .current) else { return }
+        guard let indexAtBeginning = indexAtBeginning(in: .current, year: .current) else { return }
 
         var components: DateComponents = .init()
         currentDates = (0..<DateModel.maxCellCount).compactMap { index in
                 components.day = index - indexAtBeginning
-                return calendar.date(byAdding: components, to: atBeginning(of: .current))
+                return calendar.date(byAdding: components, to: atBeginning(of: .current, year: .current))
             }
             .map { (date: Date) in
                 selectedDates[date] = false
@@ -353,16 +393,23 @@ private extension DateModel {
             .forEach { selectedDates[$0] = isSelected }
     }
     
-    func atBeginning(of month: MonthType) -> Date {
-        var components = calendar.dateComponents([.year, .month, .day], from: date(of: month))
+    func atBeginning(of month: MonthType, year: YearType) -> Date {
+        var components = calendar.dateComponents([.year, .month, .day], from: date(of: month, year: year))
         components.day = 1
         return calendar.date(from: components) ?? Date()
     }
     
-    func date(of month: MonthType) -> Date {
+    func date(of month: MonthType, year: YearType) -> Date {
         var components = DateComponents()
         components.month = {
             switch month {
+            case .previous: return -1
+            case .current:  return 0
+            case .next:     return 1
+            }
+        }()
+        components.year = {
+            switch year {
             case .previous: return -1
             case .current:  return 0
             case .next:     return 1
